@@ -4,16 +4,28 @@ const controller = require('./controller')
 
 const router = Router();
  
-
-router.get('/:user/:pass',controller.checkUserPassword);
-router.post('/adduser', controller.addUser);
-router.post('/login', controller.checkUser);
-router.post('/test', controller.tests);
-router.post('/calltruck',verifyToken, controller.CallTruck);
 router.post('/posts',verifyToken, controller.postda);
+router.post('/adduser', controller.addUser);
+router.post('/login', controller.checkUser); 
+router.post('/calltruck',verifyToken, controller.CallTruck); 
 router.post('/call', controller.calltest);
 router.post('/calltrucklistitem', controller.callListItemCallTruck);
-
+router.post('/acceptcalltruck',verifyToken,controller.acceptcalltruck);
+router.post('/listcalltruckaccepted',verifyToken, controller.listBillheaderAccepted);
+router.post('/showitemcalltruckdetailforcheck',verifyToken,controller.showDetailItemCalltruck);
+router.post('/caculatebilltotal',verifyToken, controller.updateCallTruckBillDetail);
+router.post('/confirmcheckcalltruck',verifyToken, controller.confirmCheckItemdone);
+router.post('/showcalltrucklistforpay',verifyToken,controller.showListcalltruckforpayment);
+router.post('/showcalltruckbilldetailforpay',verifyToken,controller.showListdetailcalltruckforpayment);
+router.post('/paymentcalltruk', verifyToken ,controller.paymentcalltruckbyrider);
+router.post('/showlistcallitemnoaccept',verifyToken,controller.showlistcallitemfrombranch);
+router.post('/showlistcallitemdetail',verifyToken,controller.showlistcallitemdetail);
+router.post('/acceptcallitem', verifyToken, controller.acceptcalitem);
+router.post('/showinvoicecallaccept',verifyToken,controller.showbillinvoicecallitemacceptridder);
+router.post('/showdetailitemcall',verifyToken,controller.showdetailitemcall);
+router.post('/caculatecheckcallitem',verifyToken,controller.updatebillcallitemdetail);
+router.post('/confirmcheckcallitem',verifyToken,controller.confirmcheckcallitem);
+router.post('/paycashitemcall',verifyToken,controller.paycashitemcall);
 
 function verifyToken(req, res, next) {
     // Get auth header value

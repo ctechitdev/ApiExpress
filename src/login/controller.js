@@ -110,7 +110,23 @@ const checkUser =  async  (req , res) => {
  
 }
 
- 
+const listBillheaderAccepted = async (req, res) => {
+    jwt.verify(req.token, secretkey, (err, rstoken)=>{
+        const ridderid = rstoken.id;
+        if(err){
+            res.status(201).json("token Expire");
+        }else{
+            pool.query(queries.showBillheaderacceptByRider,[ridderid],(error, results) =>{
+                if(error) throw error;
+                if(results.rows.length){
+                    res.status(200).json(results.rows);
+                }else{
+                    res.status(200).send("no item");
+                }
+            }) 
+        } 
+    }) 
+}
  
 
 const calltest =  async (req , res) => { 
@@ -135,6 +151,8 @@ const calltest =  async (req , res) => {
  
      
    }
+
+ 
 
    const acceptcalltruck = async (req, res ) =>{
     const {billheader} = req.body;
@@ -162,13 +180,15 @@ const calltest =  async (req , res) => {
  
 }
 
-const listBillheaderAccepted = async (req, res) => {
-    jwt.verify(req.token, secretkey, (err, rstoken)=>{
-        const ridderid = rstoken.id;
+
+
+const billlistforReprint = async (req, res) => {
+    jwt.verify(req.token, secretkey, (err, rstoken) =>{
+        const riderid = rstoken.id;
         if(err){
             res.status(201).json("token Expire");
         }else{
-            pool.query(queries.showBillheaderacceptByRider,[ridderid],(error, results) =>{
+            pool.query(queries.listbillforprint,[riderid],(error, results) =>{
                 if(error) throw error;
                 if(results.rows.length){
                     res.status(200).json(results.rows);
@@ -176,13 +196,30 @@ const listBillheaderAccepted = async (req, res) => {
                     res.status(200).send("no item");
                 }
             })
-
-
         }
- 
     })
     
 }
+
+const detailbillPrint = async (req, res) => {
+    jwt.verify(req.token, secretkey, (err, rstoken) =>{
+        const {billheader} = req.body;
+        if(err){
+            res.status(201).json("token Expire");
+        }else{
+            pool.query(queries.detailListbillPrint,[billheader] ,(error, results) =>{
+                if(error) throw error;
+                if(results.rows.length){
+                    res.status(200).json(results.rows);
+                }else{
+                    res.status(200).send("no item");
+                }
+            })
+        }
+    })
+    
+}
+
 const showDetailItemCalltruck = async (req, res ) =>{
     const {billinvoice} = req.body;
     jwt.verify(req.token, secretkey, (err, rstoken) => {
@@ -272,25 +309,19 @@ const confirmCheckItemdone = async (req, res) => {
 }
 
 
-   const callListItemCallTruck =  async (req , res) => { 
-     
-
-    const {billheader} = req.body;
-
+   const callListItemCallTruck =  async (req , res) => {  
+    const {billheader} = req.body; 
     pool.query(queries.getListItemCalltruck,[billheader], (error , results) => {
-        if(error) throw error;
-   
-        if(results.rows.length){
-            
-            res.status(200).json(results.rows);
-            
-             
+        if(error) throw error; 
+        if(results.rows.length){ 
+            res.status(200).json(results.rows); 
         }else {
             res.status(200).send("no item");
         } 
     }) 
    }
- 
+
+  
    const showListcalltruckforpayment = async (req, res) => {
        jwt.verify(req.token, secretkey,(err, restoken) => {
            if(err){
@@ -332,6 +363,8 @@ const confirmCheckItemdone = async (req, res) => {
                 if(error) throw error;
                 if(results.rows.length){
                     res.status(200).json(results.rows);
+                }else{
+                    res.status(200).json("no data show");
                 }
             })
 
@@ -359,6 +392,10 @@ const confirmCheckItemdone = async (req, res) => {
            }
        })
    }
+
+  
+
+
    const updatebillcallitemdetail = async (req, res) => {
        const {billid,totalprice,callitemprice,invoicecallitem} = req.body;
        pool.query(queries.caculatebillcallitem,[billid,callitemprice,totalprice],(error, results) => {
@@ -429,6 +466,21 @@ const confirmCheckItemdone = async (req, res) => {
        })
    }
 
+
+   const showcalitemlistDetail = async (req , res) => {
+          const {invoiceheader} = req.body;
+    pool.query(queries.showDetailItemCallItemList,[invoiceheader], (error , results) => {
+        if(error) throw error;
+        if(results.rows.length){
+         res.status(200).json(results.rows);
+        }else{
+         res.status(200).json("no data show");
+        }
+    });
+}
+
+ 
+
    const postda =     (req , res) => { 
     // Mock user
     jwt.verify(req.token, secretkey, (err, authData) => {
@@ -488,7 +540,7 @@ const confirmCheckItemdone = async (req, res) => {
        })
    }
 
-   const showbillinvoicecallitemacceptridder = async(req, res) => {
+   const showListCallItemPrepay = async(req, res) => {
        jwt.verify(req.token,secretkey,(errortoken, restoken)=>{
            const riiderid = restoken.id;
            if(errortoken){
@@ -496,10 +548,12 @@ const confirmCheckItemdone = async (req, res) => {
            }else{
 
            
-           pool.query(queries.showlistacceptcallitem,[riiderid], (error, results)=>{
+           pool.query(queries.showListpaycashcallItem,[riiderid], (error, results)=>{
                if(error) throw error;
                if(results.rows.length){
                    res.status(200).json(results.rows);
+               }else{
+                res.status(200).json("no data show");
                }
            })
         }
@@ -507,6 +561,40 @@ const confirmCheckItemdone = async (req, res) => {
       
         })
    }
+
+   const showCallTruckLocation = async(req, res) => {
+    const {billheaderid} = req.body;
+    pool.query(queries.locationCallTruck,[billheaderid], (error , results) => {
+        if(error) throw error;
+        if(results.rows.length){
+         res.status(200).json(results.rows);
+        }else{
+         res.status(200).json("no data show");
+        }
+    });
+}
+
+   const showbillinvoicecallitemacceptridder = async(req, res) => {
+    jwt.verify(req.token,secretkey,(errortoken, restoken)=>{
+        const riiderid = restoken.id;
+        if(errortoken){
+         res.status(200).json("expire token");
+        }else{
+
+        
+        pool.query(queries.showlistacceptcallitem,[riiderid], (error, results)=>{
+            if(error) throw error;
+            if(results.rows.length){
+                res.status(200).json(results.rows);
+            }else{
+                res.status(200).json("no data show");
+               }
+        })
+     }
+   
+   
+     })
+}
   
 
 module.exports = {
@@ -533,4 +621,9 @@ module.exports = {
     updatebillcallitemdetail,
     confirmcheckcallitem,
     paycashitemcall,
+    showcalitemlistDetail,
+    showListCallItemPrepay,
+    showCallTruckLocation,
+    billlistforReprint,
+    detailbillPrint,
 }

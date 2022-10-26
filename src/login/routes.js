@@ -9,7 +9,7 @@ router.post('/adduser', controller.addUser);
 router.post('/login', controller.checkUser); 
 router.post('/calltruck',verifyToken, controller.CallTruck); 
 router.post('/call', controller.calltest);
-router.post('/calltrucklistitem', controller.callListItemCallTruck);
+router.post('/calltrucklistitem',verifyToken, controller.callListItemCallTruck);
 router.post('/acceptcalltruck',verifyToken,controller.acceptcalltruck);
 router.post('/listcalltruckaccepted',verifyToken, controller.listBillheaderAccepted);
 router.post('/showitemcalltruckdetailforcheck',verifyToken,controller.showDetailItemCalltruck);
@@ -26,6 +26,13 @@ router.post('/showdetailitemcall',verifyToken,controller.showdetailitemcall);
 router.post('/caculatecheckcallitem',verifyToken,controller.updatebillcallitemdetail);
 router.post('/confirmcheckcallitem',verifyToken,controller.confirmcheckcallitem);
 router.post('/paycashitemcall',verifyToken,controller.paycashitemcall);
+router.post('/showacceptitemdetaillist',verifyToken,controller.showcalitemlistDetail);
+router.post('/showlistcallitemprepay',verifyToken,controller.showListCallItemPrepay);
+router.post('/locatecalltruck',verifyToken,controller.showCallTruckLocation);
+router.post('/listbill',verifyToken,controller.billlistforReprint);
+router.post('/listbillprint',verifyToken,controller.detailbillPrint);
+
+
 
 function verifyToken(req, res, next) {
     // Get auth header value

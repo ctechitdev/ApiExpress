@@ -3,6 +3,7 @@ const checkUserPassword = "SELECT * FROM tbl_staff_user where user_names = $1 ";
 const checkEmailExit = "SELECT * FROM tbl_staff_user where user_names = $1  ";
 const addUser = " INSERT INTO   tbl_staff_user(first_name, last_name,user_names, passwords,create_date )   VALUES (  $1, $2, $3,$4, now())";
 const getCalltruck = "SELECT distinct a.bill_header as bill_header,bill_total  FROM  tbl_bill_header a left join tb_customer_deposit b on a.bill_header = b.bill_header  where origin_branch_name = $1 and bh_status =1 and rc_ridder is null";
+
 const getListItemCalltruck = " SELECT a.bill_code as bill_code, mtl_name, ( case when mtl_weight is null then '0' else mtl_weight end) as mtl_weight, mtl_size, mtl_am, mtl_total_price,    create_date, ccy,   cod  FROM   tb_material a left join tb_customer_deposit b on a.bill_code = b.bill_code where bill_header =$1 ";
 const acceptCalltruck ="update tbl_bill_header set rc_ridder =$1 where bill_header = $2 ";
 const showBillheaderacceptByRider =" SELECT distinct a.bill_header as bill_header,bill_total,rc_ridder  FROM  tbl_bill_header a left join tb_customer_deposit b on a.bill_header = b.bill_header where bh_status =1 and rc_ridder  = $1";
@@ -36,8 +37,28 @@ const confirmcheckcallitemheader = "update  tbl_invoice_call_item set inv_status
 const confircheckallitemdetail = "update tb_customer_deposit set transfer_status = 6 where invoice_call_item = $1";
 const payforitemcallheader="update  tbl_invoice_call_item set inv_status =3 where inv_id = $1";
 const payforitemcalldetail="update tb_customer_deposit set transfer_status = 7 where invoice_call_item = $1";
+const showDetailItemCallItemList =" SELECT a.bill_code as bill_code, mtl_name, ( case when mtl_weight is null then '0' else mtl_weight end) as mtl_weight, mtl_size, mtl_am, mtl_total_price, "+
+" create_date, ccy,   cod  FROM tb_material a left join tb_customer_deposit b on a.bill_code = b.bill_code where invoice_call_item =$1  ";
 
+const showListpaycashcallItem ="SELECT inv_id, inv_total FROM tbl_invoice_call_item where inv_status = 2  and rc_ridder =$1";
+ 
+const locationCallTruck = "SELECT ST_X(geolocation::geometry) as landx, ST_Y(geolocation::geometry) as landy FROM tb_locations where bill_code =$1";
 
+const listbillforprint = "SELECT inv_id, inv_total, inv_date, inv_time,'call-item' as bill_type FROM   tbl_invoice_call_item  where inv_status = 3 and rc_ridder =$1  " +
+" union all " +
+" SELECT bill_header,   bill_total, bh_date, bh_time ,'call-truck' as bill_type FROM   tbl_bill_header where bh_status = 3 and rc_ridder =$1"
+
+const detailListbillPrint =" SELECT distinct  b.branch_name as origin_branch_name,e.province_name as origin_provin_name, " +
+" c.branch_name as destination_branch_id, f.province_name as des_provin_name, " +
+" (case when status_pay = '1' then 'ຕົ້ນທາງ' else 'ປາຍທາງ' end) as status_pay,  " +
+" mtl_cusdeposit_fname,mobi_cusdeposit_number,add_date, mtl_recipient_name,mtl_recipient_tel ,mtl_total_price   " +
+" FROM   tb_customer_deposit a  " +
+" left join tb_branch b on a.origin_branch_name = b.branch_id  " +
+" left join tb_branch c on a.destination_branch_id = c.branch_id " +
+" left join tb_material d on a.bill_code = d.bill_code  " +
+" left join tb_province e on b.branch_province_id = e.prov_id " +
+" left join tb_province f on c.branch_province_id =f.prov_id " +   
+" where bill_header =$1 or invoice_call_item = $1 ";
 
 module.exports = {
    
@@ -70,4 +91,9 @@ module.exports = {
     confircheckallitemdetail,
     payforitemcallheader,
     payforitemcalldetail,
+    showDetailItemCallItemList,
+    showListpaycashcallItem, 
+    locationCallTruck,
+    listbillforprint,
+    detailListbillPrint,
 };
